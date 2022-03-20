@@ -123,6 +123,31 @@ CMD [ "node", "dist/index.js" ]
 
 Notice we didn't use **npm start** to run the application because running with Node makes it efficient. Secondly, it causes exit signals such as SIGTERM and SIGINT to be received by the Node.js process instead of npm swallowing them.
 
+### Final Docker file
+
+Now your docker file should look something like this:
+
+```YAML
+FROM node:lts-alpine
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install
+
+# If you are building your code for production
+# RUN npm ci --only=production
+
+COPY . .
+
+EXPOSE 3000
+
+RUN npm run build
+
+CMD [ "node", "dist/index.js" ]
+```
+
 ### Create a dockerignore file
 
 We can further optimize our Docker image by avoiding copying some resources into the application. Create a **.dockerignore** file and paste the following code there
