@@ -6,7 +6,7 @@ services:
       - NODE_ENV=development
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     volumes:
       - ./:/usr/src/app
     container_name: express-typescript-docker

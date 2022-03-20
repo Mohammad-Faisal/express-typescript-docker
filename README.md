@@ -250,8 +250,22 @@ and check with **docker ps** to see if that command succeeded.
 
 ## Development Environment with Docker
 
-The above configuration can work for production. But during development we can't afford to build the image everytime we make any change to our code.
+The above configuration can work for production. But during development we can't afford to build the image every time we make any change to our code.
 To solve that problem we need some kind of development setup so that our code changes are reflected instantly.
+
+To do that we can create a separate **Dockerfile.dev** and add the following configuration
+
+```YAML
+FROM node:lts-alpine
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+```
 
 To achieve that let's create a **docker-compose.yml** file in the root directory.
 and add the following configuration there
@@ -265,7 +279,7 @@ services:
       - NODE_ENV=development
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     volumes:
       - ./:/usr/src/app
     container_name: express-typescript-docker
@@ -275,6 +289,8 @@ services:
       - '3000:3000'
     command: npm run dev
 ```
+
+Notice we are pointing to the **Dockerfile.dev** to tell docker-compose about the file that is required to use.
 
 It will create an image with the name express-typescript-docker and run it in development mode.
 
@@ -291,6 +307,76 @@ You can stop the containers by hitting **CTRL+C** or running the following comma
 ```sh
 docker-compose down
 ```
+
+### Using docker compose in production
+
+We can use **docker-compose** in production as well. To do that let's create a separate **Dockerfile.prod**
+
+```YAML
+FROM node:lts-alpine
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm ci --only=production
+
+COPY . .
+
+RUN npm run build
+```
+
+Notice here we don't actually need the **EXPOSE** and **CMD** command like before because **docker-compose** is going to take care of that.
+
+Now let's create a **docker-compose.prod.yml** file
+
+```YAML
+version: '3'
+
+services:
+  ts-node-docker:
+    environment:
+      - NODE_ENV=production
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    command: node dist/index.js
+```
+
+Now this will take the configuration from the **Dockerfile.prod** and run the command **node dist/index.js** from there. The rest configuration will be taken from the default **docker-compose.yml** file.
+
+To start out container in production let's run the following command
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+Notice the **-f** flag which tells docker-compose which files to use for configuration.
+
+You can verify that the containers are running by running the following command
+
+```sh
+docker ps
+```
+
+Or by hitting the http://localhost:3000
+
+### Improvements
+
+Typing all these commands can be time consuming so let's create a Makefile in the root of the project to make our lives easier!
+
+```YAML
+up:
+    docker-compose up -d
+
+up-prod:
+    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+down:
+    docker-compose down
+```
+
+Now we can just run **make up** or **make up-prod** to run the containers
 
 ### Resources
 
