@@ -1,4 +1,4 @@
-Today we will Dockerize our NodeJS(Express) Application.
+Today we will Dockerize our NodeJS(Express) Application. We will also add Hot reloading support for local development
 
 We will assume that we already have a NodeJS application up and running. If you are interested to see how we built the express application go to the following article.
 
@@ -238,9 +238,65 @@ Connected successfully on port 3000
 { message: 'Hello World' }
 ```
 
+### Stop the container.
+
+You can stop the running container by running the following command
+
+```sh
+docker stop container_id
+```
+
+and check with **docker ps** to see if that command succeeded.
+
+## Development Environment with Docker
+
+The above configuration can work for production. But during development we can't afford to build the image everytime we make any change to our code.
+To solve that problem we need some kind of development setup so that our code changes are reflected instantly.
+
+To achieve that let's create a **docker-compose.yml** file in the root directory.
+and add the following configuration there
+
+```YAML
+version: '3'
+
+services:
+  express-typescript-docker:
+    environment:
+      - NODE_ENV=development
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/src/app
+    container_name: express-typescript-docker
+    expose:
+      - '3000'
+    ports:
+      - '3000:3000'
+    command: npm run dev
+```
+
+It will create an image with the name express-typescript-docker and run it in development mode.
+
+And we can run the following command to see it in action:
+
+```sh
+docker-compose up
+```
+
+Now you can try to change any code and hit save. Your code will be automatically updated!
+
+You can stop the containers by hitting **CTRL+C** or running the following command
+
+```sh
+docker-compose down
+```
+
 ### Resources
 
 - [Docker Nodejs Best Practices](https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md)
 - [Official NodeJS documentation to setup Docker](https://nodejs.org/en/docs/guides/nodejs-docker-webapp/)
 
 ## Github repo
+
+https://github.com/Mohammad-Faisal/express-typescript-docker

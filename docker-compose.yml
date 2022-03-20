@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  ts-node-docker:
+    environment:
+      - NODE_ENV=development
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/src/app
+    container_name: express-typescript-docker
+    expose:
+      - '3000'
+    ports:
+      - '3000:3000'
+    command: npm run dev

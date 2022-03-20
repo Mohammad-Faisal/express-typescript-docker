@@ -15,7 +15,7 @@ app.get('/', async (req: Request, res: Response): Promise<Response> => {
 app.post('/post', async (req: Request, res: Response): Promise<Response> => {
   console.log(req.body);
   return res.status(200).send({
-    message: 'Hello World from post!',
+    message: 'Hello World from post updated!',
   });
 });
 
