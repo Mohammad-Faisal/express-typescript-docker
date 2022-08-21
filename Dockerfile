@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm i --omit=dev
+RUN npm i
 
 COPY . .
 
