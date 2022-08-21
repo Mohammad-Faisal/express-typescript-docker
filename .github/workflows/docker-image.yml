@@ -20,7 +20,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag express-typescript-docker
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/express-typescript-docker
 
       - name: Docker Push
         run: docker push ${{ secrets.DOCKER_USERNAME }}/express-typescript-docker
