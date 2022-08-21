@@ -23,4 +23,4 @@ jobs:
         run: docker build . --file Dockerfile --tag express-typescript-docker
 
       - name: Docker Push
-        run: docker push express-typescript-docker
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/express-typescript-docker
