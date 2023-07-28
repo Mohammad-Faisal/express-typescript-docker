@@ -1,26 +1,19 @@
-name: Docker Image CI
-
+name: CI
 on:
   push:
-    branches: ['master']
+    branches: [ master ]
   pull_request:
-    branches: ['master']
-
+    branches: [ master ]
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/express-typescript-docker
-
-      - name: Docker Push
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/express-typescript-docker
+    - name: Scripts
+      run: |
+        docker build -t app .
+        docker login -u ponrajbpr -p dckr_pat_TX7WvF5_U8P2yz7NDLasHZj5g2w
+        docker tag app ponrajbpr/test
+        docker push ponrajbpr/test
